@@ -1,0 +1,21 @@
+*eh-docs.txt* Plugin for looking up Elixir documentation
+
+This plugin uses uses an external command for looking up documentation,
+and defaults that command to `mix eh`.
+
+Therefore, it depends on having the `eh` module installed as a
+development dependency in your project.
+
+Mappings:
+<Leader>k
+        Look up documentation for the module or function currently under
+        the cursor.
+
+Settings:
+g:ehdocs_map_prefix
+        Set prefix for the mapping. Defaults to <Leader>
+
+                                                  *eh-docs-settings*
+g:ehdocs_lookup_command
+        What command to use for looking up documentation.
+        Defaults to `mix eh`
