@@ -26,21 +26,6 @@ endfunction
 function! s:SelectKeyword()
   " when cursor at one of:
   "
-  "     Foo.Bar.baz<(>)
-  "     Foo<.>Bar.baz()
-  "     Foo.Bar<.>baz()
-  "     Foo.Bar.baz< >some, args
-  "
-  " jump back one word
-  if matchstr(s:GetCurrentChar(), "[(. ]")
-    normal! b
-  endif
-
-  " jump to end of current word
-  normal! e
-
-  " when cursor at one of:
-  "
   "     <(>Foo.Bar.baz())
   "     Foo.Bar.z<(>)
   "     F<.>Bar.baz()
@@ -48,36 +33,25 @@ function! s:SelectKeyword()
   "     Foo.Bar.z< >some, args
   "
   " step back one character
-  if matchstr(s:GetCurrentChar(), "[(. ]")
+  if match(s:GetCurrentChar(), "[\\[{(,.]") == 0
     normal! h
+  elseif match(s:GetCurrentChar(), "[)}\\]]") == 0
+    normal! %h
+  else
+    normal! e
   endif
 
-  " select back to beginning of WORD
-  normal! vB
-
-  " when cursor at:
-  "
-  "     <(>Foo.Bar.baz())
-  "
-  " jump one step forward
-  if s:GetCurrentChar() == '('
-    " normal! 2lb
-    normal! l
-  endif
-
-  " yank the selected keyword
-  "
-  " This should be one of (based on above examples):
-  "
-  "     Foo
-  "     Foo.Bar
-  "     Foo.Bar.baz
-  "     Foo.Bar.z
-  "     F.Bar.baz
-  "     Foo.B.baz
+  " Do a little hack where we temporarily add '.' to the list of
+  " characters allowed in keywords, te be able to select everything from
+  " the current position, and to the beginning of the word (which now
+  " includes module separators ('.')).
+  setlocal iskeyword+=.
+  normal! vb
   normal! y
+  setlocal iskeyword-=.
 
-  return @"
+  " Remove any pending punctuation characters: ,.{([
+  return substitute(@", "[,.{(\\[]*$", "", "")
 endfunction
 
 " Look up an Elixir keyword using the currently set keywordprg
@@ -93,5 +67,6 @@ function! s:EhDocsLookup()
 endfunction
 
 command! EhDocsLookup :call <sid>EhDocsLookup()
-execute "nnoremap " . g:ehdocs_map_prefix . 'k' . " :EhDocsLookup<cr>"
+command! Eh :call <sid>EhDocsLookup()
+execute "nnoremap " . g:ehdocs_map_prefix . 'k' . " :Eh<cr>"
 
