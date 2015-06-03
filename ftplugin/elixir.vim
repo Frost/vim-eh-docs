@@ -69,4 +69,7 @@ endfunction
 command! EhDocsLookup :call <sid>EhDocsLookup()
 command! Eh :call <sid>EhDocsLookup()
 execute "nnoremap " . g:ehdocs_map_prefix . 'k' . " :Eh<cr>"
+if g:ehdocs_map_keys
+  execute "nnoremap K Eh<cr>"
+endif
 
